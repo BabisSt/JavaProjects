@@ -10,9 +10,20 @@ public class Task {
         this.isCompleted = isCompleted;
     }
 
+    int getId() {
+        return this.id;
+    }
+
+    String getDescription() {
+        return this.description;
+    }
+
+    boolean getIsCompleted() {
+        return this.isCompleted;
+    }
+
     void markAsDone() {
         isCompleted = !isCompleted;
-        System.out.println(isCompleted);
     }
 
     public String StringIt() {
