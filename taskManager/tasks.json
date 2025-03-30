@@ -1,10 +1,1 @@
-{
-  "Work": [
-    {
-      "name": "Get to work",
-      "isCompleted": false,
-      "priority": "HIGH",
-      "category": "Work"
-    }
-  ]
-}
+{"Fitness":[{"name":"Go for a walk","isCompleted":false,"priority":"MEDIUM","category":"Fitness"},{"name":"Renew gym membership","isCompleted":false,"priority":"MEDIUM","category":"Fitness"}],"Personal":[{"name":"Learn Java","isCompleted":false,"priority":"HIGH","category":"Personal"},{"name":"Make something to eat","isCompleted":false,"priority":"MEDIUM","category":"Personal"},{"name":"Clean the house","isCompleted":false,"priority":"LOW","category":"Personal"}],"Work":[{"name":"Get to work","isCompleted":false,"priority":"HIGH","category":"Work"},{"name":"Finish Tasks","isCompleted":false,"priority":"HIGH","category":"Work"},{"name":"Talk to Client","isCompleted":false,"priority":"MEDIUM","category":"Work"}],"Shopping":[{"name":"Buy Groceries","isCompleted":false,"priority":"LOW","category":"Shopping"},{"name":"Buy Meat","isCompleted":false,"priority":"MEDIUM","category":"Shopping"}]}

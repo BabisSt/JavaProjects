@@ -34,6 +34,14 @@ public class Task {
         this.priority = priority;
     }
 
+    Task() {
+        super();
+        this.name = null;
+        this.isCompleted = false;
+        this.priority = null;
+        this.category = null;
+    }
+
     public void markAsDone() {
         this.isCompleted = true;
     }
