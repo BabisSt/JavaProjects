@@ -1,5 +1,7 @@
 package com.example;
 
+import java.util.*;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 enum Priority {
@@ -19,6 +21,7 @@ public class Task {
     private static int id;
     private String name;
     private boolean isCompleted;
+    private String dueDate;
 
     @JsonProperty("priority")
     private Priority priority;
@@ -26,10 +29,11 @@ public class Task {
     @JsonProperty("category")
     private Category category;
 
-    Task(String name, boolean isCompleted, Priority priority, Category category) {
+    Task(String name, boolean isCompleted, String dueDate, Priority priority, Category category) {
         id++;
         this.name = name;
         this.isCompleted = isCompleted;
+        this.dueDate = dueDate;
         this.category = category;
         this.priority = priority;
     }
@@ -60,6 +64,14 @@ public class Task {
 
     public boolean getIsCompleted() {
         return this.isCompleted;
+    }
+
+    public void setDueDate(String duDate) {
+        this.dueDate = duDate;
+    }
+
+    public String getDueDate() {
+        return this.dueDate;
     }
 
     public void setPriority(Priority priority) {
