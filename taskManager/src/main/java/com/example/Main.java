@@ -1,8 +1,6 @@
 package com.example;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -23,9 +21,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -42,7 +40,22 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         VBox root = new VBox(10); // Create VBox as the root layout
         Scene scene = new Scene(root, 500, 500); // Set width and height
+	
+		Button add = new Button("Add task");
+		Button exit = new Button("Exit");
 
+		//For add and exit
+		HBox buttonContainer = new HBox(10); // 10px spacing between buttons
+        buttonContainer.setAlignment(Pos.CENTER); // Center buttons in the line
+
+		//for add task
+		HBox newTaskContailer = new HBox(10); 
+        newTaskContailer.setAlignment(Pos.CENTER); 
+		Button confirmAdd = new Button("Add");
+
+		TextArea newTaskName = new TextArea();
+
+	
         // Categories Label
         Label categoriesLabel = new Label("Task Categories");
         categoriesLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
@@ -106,21 +119,30 @@ public class Main extends Application {
             }
 
         }
-		HBox buttonContainer = new HBox(10); // 10px spacing between buttons
-        buttonContainer.setAlignment(Pos.CENTER); // Center buttons in the line
-		// Add task button
-		Button add = new Button("Add task");
-		add.setOnAction(new EventHandler<ActionEvent>() {
 
+		// Add task button
+		add.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
+				//Remove previous 
+				newTaskContailer.getChildren().remove(newTaskName);
+				newTaskContailer.getChildren().remove(confirmAdd);
+				root.getChildren().remove(newTaskContailer);
 				
+				//add the fields
+				Task newTask = new Task(null, false, null, null, null);
+				newTaskContailer.getChildren().add(newTaskName);
+				newTaskContailer.getChildren().add(confirmAdd);
+				root.getChildren().add(newTaskContailer);
+
+				newTask.setName(newTaskName.getText());
 			}
+		
 
 		});
 
-        // Exit button
-        Button exit = new Button("Exit");
+
+		//Exit buttom
         exit.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -130,10 +152,10 @@ public class Main extends Application {
 
         });
         // add button
-
 		buttonContainer.getChildren().add(add); // Add button to HBox
 		buttonContainer.getChildren().add(exit); // Add button to HBox
 		root.getChildren().add(buttonContainer);
+		
         // Set scene and show stage
         primaryStage.setScene(scene);
         primaryStage.setTitle("Task Manager");
@@ -190,51 +212,50 @@ public class Main extends Application {
 
     }
 
-    public void displayTasks(VBox root, HashMap<Category, ArrayList<Task>> tasks, File file) {
-        HBox buttonContainer = new HBox(10); // 10px spacing between buttons
-        buttonContainer.setAlignment(Pos.CENTER); // Center buttons in the line
-        ArrayList<Button> buttons = new ArrayList<>(); // Store all buttons
-
-        for (Category category : tasks.keySet()) {
-            Button b = new Button(category.toString());
-
-            // Set default button style
-            b.setStyle("-fx-background-color: lightgray; -fx-text-fill: black;");
-
-            b.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent e) {
-                    // Reset all buttons to default color
-                    for (Button btn : buttons) {
-                        btn.setStyle("-fx-background-color: lightgray; -fx-text-fill: black;");
-                    }
-
-                    // Change color of selected button
-                    b.setStyle("-fx-background-color: darkblue; -fx-text-fill: white;");
-
-
-					// Remove only task rows (not the category buttons)
-					root.getChildren().removeIf(node -> node instanceof HBox && node != buttonContainer);
-					taskLabels.clear();
-
-
-                    // Get tasks for the selected category
+	public void displayTasks(VBox root, HashMap<Category, ArrayList<Task>> tasks, File file) {
+		HBox buttonContainer = new HBox(10); // 10px spacing between buttons
+		buttonContainer.setAlignment(Pos.CENTER); // Center buttons in the line
+		ArrayList<Button> buttons = new ArrayList<>(); // Store all buttons
+		ArrayList<HBox> taskRows = new ArrayList<>(); // Store task rows for removal later
+	
+		// Add category buttons
+		for (Category category : tasks.keySet()) {
+			Button b = new Button(category.toString());
+	
+			// Set default button style
+			b.setStyle("-fx-background-color: lightgray; -fx-text-fill: black;");
+	
+			b.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent e) {
+					// Reset all buttons to default color
+					for (Button btn : buttons) {
+						btn.setStyle("-fx-background-color: lightgray; -fx-text-fill: black;");
+					}
+	
+					// Change color of selected button
+					b.setStyle("-fx-background-color: darkblue; -fx-text-fill: white;");
+	
+					// Remove only task rows (not the category buttons or the "Add Task" and "Exit" buttons)
+					root.getChildren().removeAll(taskRows);
+					taskRows.clear(); // Clear the task rows list
+	
+					// Get tasks for the selected category
 					ArrayList<Task> taskList = tasks.get(category);
 					for (Task task : taskList) {
-
 						// Create a label for the task
 						Label taskLabel = new Label(
 								task.getName() + " - " + task.getPriority() + " - " + task.getDueDate());
 						// Create a button next to the label
 						Button onCompleteButton = new Button("✔"); // You can change the button text
-						if(!task.getIsCompleted())
+						if (!task.getIsCompleted())
 							onCompleteButton.setStyle("-fx-background-color: green; -fx-text-fill: white;"); // Optional styling
 						else {
 							taskLabel.setStyle("-fx-text-fill: gray; -fx-strikethrough: true;"); // Strike through completed task
 							onCompleteButton.setDisable(true); // Disable button after clicking
 						}
-
-						//Due date label
+	
+						// Due date label
 						SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 						Date dueDate = null;
 						try {
@@ -243,52 +264,47 @@ public class Main extends Application {
 						} catch (ParseException er) {
 							System.out.println("Error parsing date: " + er.getMessage());
 						}
-
+	
 						// Get today's date
 						LocalDate today = LocalDate.now();
 						Date todayDate = Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant());
-						
+	
 						Label taskOverdue = new Label("");
-						if(dueDate.before(todayDate))	{
+						if (dueDate.before(todayDate)) {
 							taskOverdue = new Label("Task overdue");
 							taskOverdue.setStyle("-fx-font-weight: bold; -fx-text-fill: red;");
-
 						}
-					
+	
 						// Action for completing a task
 						onCompleteButton.setOnAction(new EventHandler<ActionEvent>() {
-
 							@Override
-                			public void handle(ActionEvent e) {
+							public void handle(ActionEvent e) {
 								taskLabel.setStyle("-fx-text-fill: gray; -fx-strikethrough: true;"); // Strike through completed task
 								onCompleteButton.setDisable(true); // Disable button after clicking
 								task.markAsDone();
 								// Save updated tasks to JSON file
-    							saveTasksToJson(tasks, file);
+								saveTasksToJson(tasks, file);
 							}
-							
 						});
-					
+	
 						// Group label and button in an HBox
 						HBox taskRow = new HBox(10, taskLabel, onCompleteButton, taskOverdue); // 10px spacing
 						taskRow.setAlignment(Pos.CENTER_LEFT); // Align items
-					
-						// Add HBox to the root container
+	
+						// Add HBox to the root container and taskRows list
 						root.getChildren().add(taskRow);
-						taskLabels.add(taskLabel);
+						taskRows.add(taskRow); // Add to taskRows for later removal
 					}
-
-					
-                }
-            });
-
-            buttons.add(b); // Store button reference
-            buttonContainer.getChildren().add(b); // Add button to HBox
-        }
-
-        root.getChildren().add(buttonContainer); // Add HBox to VBox
-    }
-
+				}
+			});
+	
+			buttons.add(b); // Store button reference
+			buttonContainer.getChildren().add(b); // Add button to HBox
+		}
+	
+		root.getChildren().add(buttonContainer); // Add HBox to VBox
+	}
+	
 	//update the file with the changes
 	private void saveTasksToJson(HashMap<Category, ArrayList<Task>> tasks, File file) {
 		try {
