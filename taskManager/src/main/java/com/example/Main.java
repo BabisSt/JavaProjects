@@ -1,10 +1,17 @@
 package com.example;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -55,7 +62,7 @@ public class Main extends Application {
                     HashMap<Category, ArrayList<Task>> tasks = new HashMap<>();
 
                     addTasks(tasks);
-
+					sortTasks(tasks);
                     // Convert tasks to JSON and write to file
                     ObjectMapper objectMapper = new ObjectMapper();
                     objectMapper.writeValue(file, tasks);
@@ -69,7 +76,7 @@ public class Main extends Application {
                                 new TypeReference<HashMap<Category, ArrayList<Task>>>() {
                                 });
 
-                        displayTasks(root, tasks);
+                        displayTasks(root, tasks,file);
 
                     } catch (IOException e) {
                         System.out.println("An error occurred while reading the file.");
@@ -90,7 +97,8 @@ public class Main extends Application {
                 HashMap<Category, ArrayList<Task>> tasks = objectMapper.readValue(file,
                         new TypeReference<HashMap<Category, ArrayList<Task>>>() {
                         });
-                displayTasks(root, tasks);
+				sortTasks(tasks);		
+                displayTasks(root, tasks,file);
 
             } catch (IOException e) {
                 System.out.println("An error occurred while reading the file.");
@@ -98,10 +106,22 @@ public class Main extends Application {
             }
 
         }
+		HBox buttonContainer = new HBox(10); // 10px spacing between buttons
+        buttonContainer.setAlignment(Pos.CENTER); // Center buttons in the line
+		// Add task button
+		Button add = new Button("Add task");
+		add.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent e) {
+				
+			}
+
+		});
 
         // Exit button
-        Button b = new Button("Exit");
-        b.setOnAction(new EventHandler<ActionEvent>() {
+        Button exit = new Button("Exit");
+        exit.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
             public void handle(ActionEvent e) {
@@ -110,8 +130,10 @@ public class Main extends Application {
 
         });
         // add button
-        root.getChildren().add(b);
 
+		buttonContainer.getChildren().add(add); // Add button to HBox
+		buttonContainer.getChildren().add(exit); // Add button to HBox
+		root.getChildren().add(buttonContainer);
         // Set scene and show stage
         primaryStage.setScene(scene);
         primaryStage.setTitle("Task Manager");
@@ -120,7 +142,6 @@ public class Main extends Application {
 
     public void addTasks(HashMap<Category, ArrayList<Task>> tasks) {
         ArrayList<Task> workTasks = new ArrayList<>();
-        // Create date instance
         // Create date instance
         Date d1 = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -169,7 +190,7 @@ public class Main extends Application {
 
     }
 
-    public void displayTasks(VBox root, HashMap<Category, ArrayList<Task>> tasks) {
+    public void displayTasks(VBox root, HashMap<Category, ArrayList<Task>> tasks, File file) {
         HBox buttonContainer = new HBox(10); // 10px spacing between buttons
         buttonContainer.setAlignment(Pos.CENTER); // Center buttons in the line
         ArrayList<Button> buttons = new ArrayList<>(); // Store all buttons
@@ -191,18 +212,73 @@ public class Main extends Application {
                     // Change color of selected button
                     b.setStyle("-fx-background-color: darkblue; -fx-text-fill: white;");
 
-                    // Clear previous task labels
-                    root.getChildren().removeAll(taskLabels);
-                    taskLabels.clear();
+
+					// Remove only task rows (not the category buttons)
+					root.getChildren().removeIf(node -> node instanceof HBox && node != buttonContainer);
+					taskLabels.clear();
+
 
                     // Get tasks for the selected category
-                    ArrayList<Task> taskList = tasks.get(category);
-                    for (Task task : taskList) {
-                        Label taskLabel = new Label(
-                                task.getName() + " - " + task.getPriority() + " - " + task.getDueDate());
-                        root.getChildren().add(taskLabel);
-                        taskLabels.add(taskLabel);
-                    }
+					ArrayList<Task> taskList = tasks.get(category);
+					for (Task task : taskList) {
+
+						// Create a label for the task
+						Label taskLabel = new Label(
+								task.getName() + " - " + task.getPriority() + " - " + task.getDueDate());
+						// Create a button next to the label
+						Button onCompleteButton = new Button("✔"); // You can change the button text
+						if(!task.getIsCompleted())
+							onCompleteButton.setStyle("-fx-background-color: green; -fx-text-fill: white;"); // Optional styling
+						else {
+							taskLabel.setStyle("-fx-text-fill: gray; -fx-strikethrough: true;"); // Strike through completed task
+							onCompleteButton.setDisable(true); // Disable button after clicking
+						}
+
+						//Due date label
+						SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+						Date dueDate = null;
+						try {
+							// Convert String to Date
+							dueDate = sdf.parse(task.getDueDate());
+						} catch (ParseException er) {
+							System.out.println("Error parsing date: " + er.getMessage());
+						}
+
+						// Get today's date
+						LocalDate today = LocalDate.now();
+						Date todayDate = Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant());
+						
+						Label taskOverdue = new Label("");
+						if(dueDate.before(todayDate))	{
+							taskOverdue = new Label("Task overdue");
+							taskOverdue.setStyle("-fx-font-weight: bold; -fx-text-fill: red;");
+
+						}
+					
+						// Action for completing a task
+						onCompleteButton.setOnAction(new EventHandler<ActionEvent>() {
+
+							@Override
+                			public void handle(ActionEvent e) {
+								taskLabel.setStyle("-fx-text-fill: gray; -fx-strikethrough: true;"); // Strike through completed task
+								onCompleteButton.setDisable(true); // Disable button after clicking
+								task.markAsDone();
+								// Save updated tasks to JSON file
+    							saveTasksToJson(tasks, file);
+							}
+							
+						});
+					
+						// Group label and button in an HBox
+						HBox taskRow = new HBox(10, taskLabel, onCompleteButton, taskOverdue); // 10px spacing
+						taskRow.setAlignment(Pos.CENTER_LEFT); // Align items
+					
+						// Add HBox to the root container
+						root.getChildren().add(taskRow);
+						taskLabels.add(taskLabel);
+					}
+
+					
                 }
             });
 
@@ -212,5 +288,29 @@ public class Main extends Application {
 
         root.getChildren().add(buttonContainer); // Add HBox to VBox
     }
+
+	//update the file with the changes
+	private void saveTasksToJson(HashMap<Category, ArrayList<Task>> tasks, File file) {
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			sortTasks(tasks);
+			objectMapper.writeValue(file, tasks); // Save tasks as JSON
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+
+	private void sortTasks(HashMap<Category, ArrayList<Task>> tasks)
+	{
+		for (Category category : tasks.keySet()) {
+			//sort tasks based on priority
+			ArrayList<Task> taskList = tasks.get(category);
+			taskList.sort(Comparator.comparing(Task::getPriority));
+			Collections.reverse(taskList);
+		}
+		
+		
+	}
 
 }
