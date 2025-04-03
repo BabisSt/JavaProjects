@@ -109,7 +109,6 @@ public class Main extends Application {
                         tasks.putAll(
                                 objectMapper.readValue(file, new TypeReference<HashMap<Category, ArrayList<Task>>>() {
                                 }));
-                        final HashMap<Category, ArrayList<Task>> taskMap = tasks;
 
                         displayTasks(root, tasks, file, taskRows);
 
@@ -132,7 +131,6 @@ public class Main extends Application {
                 tasks.clear();
                 tasks.putAll(objectMapper.readValue(file, new TypeReference<HashMap<Category, ArrayList<Task>>>() {
                 }));
-                final HashMap<Category, ArrayList<Task>> taskMap = tasks;
 
                 sortTasks(tasks);
                 displayTasks(root, tasks, file, taskRows);
@@ -144,64 +142,72 @@ public class Main extends Application {
 
         }
 
-        add.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
+		add.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				// Ensure only one set of items
+				if (priorityBox.getItems().isEmpty()) {
+					priorityBox.getItems().addAll(Priority.HIGH, Priority.MEDIUM, Priority.LOW);
+				}
+				if (categoryBox.getItems().isEmpty()) {
+					categoryBox.getItems().addAll(Category.Work, Category.Shopping, Category.Personal, Category.Fitness);
+				}
+		
+				// Change button style
+				add.setStyle("-fx-background-color: darkblue; -fx-text-fill: white;");
+		
+				// Remove previous UI elements
+				newTaskContainer.getChildren().clear();
 
-                // Ensure only one set of items
-                if (priorityBox.getItems().isEmpty()) {
-                    priorityBox.getItems().addAll(Priority.HIGH, Priority.MEDIUM, Priority.LOW);
-                }
-                if (categoryBox.getItems().isEmpty()) {
-                    categoryBox.getItems().addAll(Category.Work, Category.Shopping, Category.Personal,
-                            Category.Fitness);
-                }
-
-                // Change button style
-                add.setStyle("-fx-background-color: darkblue; -fx-text-fill: white;");
-
-                // Remove previous UI elements
-                newTaskContainer.getChildren().clear();
-                root.getChildren().remove(newTaskContainer);
-                root.getChildren().removeAll(taskRows);
-
-                // Create new task object (but don't set values yet)
-                Task newTask = new Task(null, false, null, null, null);
-
-                // Add UI elements
-                newTaskContainer.getChildren().addAll(categoryBox, priorityBox, newTaskName, datePicker, confirmAdd);
-                root.getChildren().add(newTaskContainer);
-
-                // Set values when "Confirm" is clicked
-                confirmAdd.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent e) {
-                        if (newTaskName.getText() != null && !newTaskName.getText().isEmpty()) {
-                            newTask.setName(newTaskName.getText());
-                        }
-
-                        if (datePicker.getValue() != null) {
-                            newTask.setDueDate(formatter.format(datePicker.getValue()).toString());
-                        }
-
-                        if (categoryBox.getValue() != null) {
-                            newTask.setCategory((Category) categoryBox.getValue());
-                        }
-
-                        if (priorityBox.getValue() != null) {
-                            newTask.setPriority((Priority) priorityBox.getValue());
-                        }
-
-                        // Save the task after setting values
-                        saveTaskToJson(newTask, file);
-                        updateTasks(file, tasks);
-                        displayTasks(root, tasks, file, taskRows);
-                    }
-                });
-            }
-        });
-
-        // Exit buttom
+				root.getChildren().removeAll(taskRows);
+		
+				// Create new task object (but don't set values yet)
+				Task newTask = new Task(null, false, null, null, null);
+		
+				// Create labels
+				Label categoryLabel = new Label("Category:");
+				Label priorityLabel = new Label("Priority:");
+				Label taskNameLabel = new Label("Task Name:");
+				Label dueDateLabel = new Label("Due Date:");
+		
+				// Arrange fields with labels
+				HBox categoryRow = new HBox(10, categoryLabel, categoryBox);
+				HBox priorityRow = new HBox(10, priorityLabel, priorityBox);
+				HBox taskNameRow = new HBox(10, taskNameLabel, newTaskName);
+				HBox dueDateRow = new HBox(10, dueDateLabel, datePicker);
+		
+				// Add UI elements to container
+				newTaskContainer.getChildren().addAll(categoryRow, priorityRow, taskNameRow, dueDateRow, confirmAdd);
+				root.getChildren().add(newTaskContainer);
+		
+				// Set values when "Confirm" is clicked
+				confirmAdd.setOnAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent e) {
+						if (newTaskName.getText() != null && !newTaskName.getText().isEmpty()) {
+							newTask.setName(newTaskName.getText());
+						}
+		
+						if (datePicker.getValue() != null) {
+							newTask.setDueDate(formatter.format(datePicker.getValue()).toString());
+						}
+		
+						if (categoryBox.getValue() != null) {
+							newTask.setCategory((Category) categoryBox.getValue());
+						}
+		
+						if (priorityBox.getValue() != null) {
+							newTask.setPriority((Priority) priorityBox.getValue());
+						}
+		
+						// Save the task after setting values
+						saveTaskToJson(newTask, file);
+						updateTasks(file, tasks);
+					}
+				});
+			}
+		});
+		
         exit.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -273,7 +279,7 @@ public class Main extends Application {
 
     public void displayTasks(VBox root, HashMap<Category, ArrayList<Task>> tasks, File file, ArrayList<HBox> taskRows) {
         // Remove existing category button row if it exists
-        root.getChildren().removeIf(node -> node instanceof HBox);
+        // root.getChildren().removeIf(node -> node instanceof HBox);
 
         HBox buttonContainer = new HBox(10); // 10px spacing between buttons
         buttonContainer.setAlignment(Pos.CENTER); // Center buttons in the line
@@ -328,17 +334,6 @@ public class Main extends Application {
 
         // Add buttonContainer back to root only once
         root.getChildren().add(buttonContainer);
-    }
-
-    // update the file with the changes
-    private void saveTasksToJson(HashMap<Category, ArrayList<Task>> tasks, File file) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            sortTasks(tasks);
-            objectMapper.writeValue(file, tasks); // Save tasks as JSON
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
     }
 
     public void saveTaskToJson(Task newTask, File file) {
