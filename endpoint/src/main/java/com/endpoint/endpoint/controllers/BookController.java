@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,32 +44,38 @@ public class BookController {
     private BookService bookService;
 
     @GetMapping()
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public List<Book> getAllBooks() {
         return bookService.getAllBooks();
     }
 
    @GetMapping("/author/{author}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public Optional<List<Book>> getBooksByAuthor(@PathVariable String author){
         return bookService.getBookByAuthor(author);
     }
 
     @GetMapping("/title/{title}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public Optional<Book> getBookByTitle(@PathVariable String title){
         return bookService.getByTitle(title);
     }
 
     @GetMapping("/isdn/{isdn}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public Optional<Book> getBookByIsdn(@PathVariable Long isdn){
         return bookService.getByIsdn(isdn);
     }
 
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public Book creatBook(@RequestBody Book book){
         return bookService.createBook(book);
     }
 
     @PutMapping("/{isdn}/{title}/{content}/{author}/{releaseDate}")
+    @PreAuthorize("hasRole('ADMIN')")
     public Book updateBook(@PathVariable("isdn") Long isdm,@PathVariable("title") String title, 
         @PathVariable("content") String content ,  @PathVariable("author") String author ,
         @PathVariable("date") Date releaseDate, @RequestBody Book book ){
@@ -76,6 +83,7 @@ public class BookController {
     }
         
     @DeleteMapping("/{isdn}")
+    @PreAuthorize("hasRole('ADMIN')")
     public boolean deleteBook(@PathVariable Long isdn){
         return bookService.deleteBook(isdn);
     }
