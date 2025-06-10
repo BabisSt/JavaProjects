@@ -1,0 +1,24 @@
+package main.java.com.endpoint.endpoint.repositories;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import main.java.com.endpoint.endpoint.model.Book;
+
+// Spring Data JPA will auto-implement this method based on its name.
+// Example: List<Book> findByAuthor(String author);
+// It maps to: SELECT * FROM book WHERE author = ?;
+// No need to write a method body or query manually — just ensure
+// 'author' is a field in your Book entity and the method name matches it.
+
+
+@Repository
+public interface BookRepository extends JpaRepository<Book, Long> {
+    
+    Optional<Book> findByTitle(String title);
+
+    List<Book> findByAuthor(String author);
+}
