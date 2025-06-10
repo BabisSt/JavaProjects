@@ -1,6 +1,6 @@
-package main.java.com.endpoint.endpoint.model;
+package com.endpoint.endpoint.model;
 
-import java.sql.Date;
+import java.util.Date;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -14,6 +14,8 @@ public class Book {
     private String author;
     private Date releaseDate;
     private String content;
+
+    public Book(){};
 
     public Book (Long isdn , String title, String author, Date releaseDate, String content){
         this.isdn = isdn;

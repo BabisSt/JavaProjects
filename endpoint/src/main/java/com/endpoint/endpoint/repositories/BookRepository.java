@@ -1,4 +1,4 @@
-package main.java.com.endpoint.endpoint.repositories;
+package com.endpoint.endpoint.repositories;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import main.java.com.endpoint.endpoint.model.Book;
+import com.endpoint.endpoint.model.Book;
 
 // Spring Data JPA will auto-implement this method based on its name.
 // Example: List<Book> findByAuthor(String author);
@@ -20,5 +20,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     
     Optional<Book> findByTitle(String title);
 
-    List<Book> findByAuthor(String author);
+    Optional<Book> findByIsdn(Long isdn);
+
+    Optional<List<Book>> findByAuthor(String author);
 }
