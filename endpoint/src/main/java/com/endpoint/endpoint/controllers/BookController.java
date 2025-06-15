@@ -15,7 +15,6 @@
  * consider differentiating the URL patterns to avoid ambiguity.
  */
 
-
 package com.endpoint.endpoint.controllers;
 
 import java.util.Date;
@@ -33,59 +32,58 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.endpoint.endpoint.dto.BookDTO;
 import com.endpoint.endpoint.model.Book;
 import com.endpoint.endpoint.services.BookService;
 
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
-    
+
     @Autowired
     private BookService bookService;
 
     @GetMapping()
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public List<Book> getAllBooks() {
+    public List<BookDTO> getAllBooks() {
         return bookService.getAllBooks();
     }
 
-   @GetMapping("/author/{author}")
+    @GetMapping("/author/{author}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public Optional<List<Book>> getBooksByAuthor(@PathVariable String author){
+    public Optional<List<BookDTO>> getBooksByAuthor(@PathVariable String author) {
         return bookService.getBookByAuthor(author);
     }
 
     @GetMapping("/title/{title}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public Optional<Book> getBookByTitle(@PathVariable String title){
+    public Optional<BookDTO> getBookByTitle(@PathVariable String title) {
         return bookService.getByTitle(title);
     }
 
     @GetMapping("/isdn/{isdn}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public Optional<Book> getBookByIsdn(@PathVariable Long isdn){
+    public Optional<BookDTO> getBookByIsdn(@PathVariable Long isdn) {
         return bookService.getByIsdn(isdn);
     }
 
-
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public Book creatBook(@RequestBody Book book){
-        return bookService.createBook(book);
+    public BookDTO creatBook(@RequestBody BookDTO bookDto) {
+        return bookService.createBook(bookDto);
     }
 
     @PutMapping("/{isdn}/{title}/{content}/{author}/{releaseDate}")
     @PreAuthorize("hasRole('ADMIN')")
-    public Book updateBook(@PathVariable("isdn") Long isdm,@PathVariable("title") String title, 
-        @PathVariable("content") String content ,  @PathVariable("author") String author ,
-        @PathVariable("date") Date releaseDate, @RequestBody Book book ){
+    public BookDTO updateBook(@PathVariable("isdn") Long isdm, @PathVariable("title") String title,
+            @PathVariable("content") String content, @PathVariable("author") String author,
+            @PathVariable("date") Date releaseDate, @RequestBody Book book) {
         return bookService.updateBook(isdm, title, content, author, releaseDate, book);
     }
-        
+
     @DeleteMapping("/{isdn}")
     @PreAuthorize("hasRole('ADMIN')")
-    public boolean deleteBook(@PathVariable Long isdn){
+    public boolean deleteBook(@PathVariable Long isdn) {
         return bookService.deleteBook(isdn);
     }
 }
-

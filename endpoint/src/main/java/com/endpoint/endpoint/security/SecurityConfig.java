@@ -27,16 +27,16 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService users() {
         UserDetails user = User.builder()
-            .username("user")
-            .password("{noop}password")  // {noop} means no encoding, plain text password
-            .roles("USER")
-            .build();
+                .username("user")
+                .password("{noop}password") // {noop} means no encoding, plain text password
+                .roles("USER")
+                .build();
 
         UserDetails admin = User.builder()
-            .username("admin")
-            .password("{noop}adminpass")
-            .roles("ADMIN")
-            .build();
+                .username("admin")
+                .password("{noop}adminpass")
+                .roles("ADMIN")
+                .build();
 
         return new InMemoryUserDetailsManager(user, admin);
     }
@@ -44,12 +44,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf().disable() // Disable CSRF for simplicity, enable later in production
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/books/**").authenticated() // all book endpoints require auth
-                .anyRequest().permitAll()  // other endpoints are open
-            )
-            .httpBasic();  // use HTTP Basic Auth for simplicity (username/password in header)
+                .csrf().disable() // Disable CSRF for simplicity, enable later in production
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/books/**").authenticated() // all book endpoints require auth
+                        .anyRequest().permitAll() // other endpoints are open
+                )
+                .httpBasic(); // use HTTP Basic Auth for simplicity (username/password in header)
 
         return http.build();
     }

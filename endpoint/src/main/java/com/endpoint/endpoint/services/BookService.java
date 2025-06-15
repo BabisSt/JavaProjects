@@ -19,10 +19,13 @@ package com.endpoint.endpoint.services;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.endpoint.endpoint.dto.BookDTO;
+import com.endpoint.endpoint.mapper.BookMapper;
 import com.endpoint.endpoint.model.Book;
 import com.endpoint.endpoint.repositories.BookRepository;
 
@@ -32,45 +35,55 @@ public class BookService {
     @Autowired
     private BookRepository bookRepository;
 
-    public List<Book> getAllBooks () {
-        return bookRepository.findAll();
+    public List<BookDTO> getAllBooks() {
+        List<Book> books = bookRepository.findAll();
+
+        return books.stream().map(b -> BookMapper.toDTO(b))
+                .collect(Collectors.toList());
     }
 
-    public Optional<List<Book>> getBookByAuthor(String author) {
-        return bookRepository.findByAuthor(author);
+    public Optional<List<BookDTO>> getBookByAuthor(String author) {
+        Optional<List<Book>> listOfBooks = bookRepository.findByAuthor(author);
+
+        return listOfBooks.map(books -> books.stream().map(b -> BookMapper.toDTO(b)).collect(Collectors.toList()));
     }
 
-    public Optional<Book> getByTitle(String title){
-        return bookRepository.findByTitle(title);
+    public Optional<BookDTO> getByTitle(String title) {
+
+        Optional<Book> book = bookRepository.findByTitle(title);
+        return BookMapper.OptionaltoDTO(book);
     }
 
-    public Optional<Book> getByIsdn(Long isdn){
-        return bookRepository.findByIsdn(isdn);
+    public Optional<BookDTO> getByIsdn(Long isdn) {
+        Optional<Book> book = bookRepository.findByIsdn(isdn);
+        return BookMapper.OptionaltoDTO(book);
     }
 
-    public Book createBook (Book book){
-        return bookRepository.save(book);
+    public BookDTO createBook(BookDTO bookDTO) {
+        Book book = BookMapper.toEntity(bookDTO);
+        Book savedBook = bookRepository.save(book);
+        return BookMapper.toDTO(savedBook);
     }
 
-    public Book updateBook (Long isdn, String title, String content, String author, Date releaseDate,Book book){
-        if(bookRepository.existsById(isdn)){
+    public BookDTO updateBook(Long isdn, String title, String content, String author, Date releaseDate, Book book) {
+        if (bookRepository.existsById(isdn)) {
             book.setIsdn(isdn);
             book.setTitle(title);
             book.setContent(content);
             book.setAuthor(author);
             book.setReleaseDate(releaseDate);
-
-            return bookRepository.save(book);
+            Book savedBook = bookRepository.save(book);
+            return BookMapper.toDTO(savedBook);
         }
         return null;
     }
 
-    public boolean deleteBook(Long isdn){
-        if(bookRepository.existsById(isdn)){
+    public boolean deleteBook(Long isdn) {
+        if (bookRepository.existsById(isdn)) {
             bookRepository.deleteById(isdn);
             return true;
         }
         return false;
     }
-    
+
 }

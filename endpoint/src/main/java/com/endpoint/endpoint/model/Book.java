@@ -15,53 +15,54 @@ public class Book {
     private Date releaseDate;
     private String content;
 
-    public Book(){};
+    public Book() {
+    };
 
-    public Book (Long isdn , String title, String author, Date releaseDate, String content){
+    public Book(Long isdn, String title, String author, Date releaseDate, String content) {
         this.isdn = isdn;
         this.title = title;
         this.author = author;
         this.releaseDate = releaseDate;
         this.content = content;
     }
-    
-    public Long getIsdn(){
+
+    public Long getIsdn() {
         return this.isdn;
     }
 
-    public void setIsdn(Long isdn){
+    public void setIsdn(Long isdn) {
         this.isdn = isdn;
     }
 
-    public String getTitle(){
+    public String getTitle() {
         return this.title;
     }
 
-    public void setTitle(String title){
+    public void setTitle(String title) {
         this.title = title;
     }
 
-    public String getAuthor(){
+    public String getAuthor() {
         return this.author;
     }
 
-    public void setAuthor(String author){
+    public void setAuthor(String author) {
         this.author = author;
     }
 
-    public Date getReleaseDate(){
+    public Date getReleaseDate() {
         return this.releaseDate;
     }
 
-    public void setReleaseDate(Date releaseDate){
+    public void setReleaseDate(Date releaseDate) {
         this.releaseDate = releaseDate;
     }
 
-    public String getContent(){
+    public String getContent() {
         return this.content;
     }
 
-    public void setContent(String content){
+    public void setContent(String content) {
         this.content = content;
     }
 }
