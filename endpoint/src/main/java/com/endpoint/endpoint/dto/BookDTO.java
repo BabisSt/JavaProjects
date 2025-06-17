@@ -9,27 +9,39 @@
 
 package com.endpoint.endpoint.dto;
 
-public class BookDTO {
-    private Long isdn;
-    private String title;
-    private String author;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
+public class BookDTO {
+
+    @Id
+    @NotBlank
+    @Pattern(regexp = "^(\\d{10}|\\d{13})$", message = "ISDN must be either 10 or 13 digits")
+    private String isdn;
+
+    @NotBlank
+    private String title;
+
+    @NotBlank
+    private String author;
+   
     // Constructors
     public BookDTO() {
     }
 
-    public BookDTO(Long isdn, String title, String author) {
+    public BookDTO(String isdn, String title, String author) {
         this.isdn = isdn;
         this.title = title;
         this.author = author;
     }
 
     // Getters and setters
-    public Long getIsdn() {
+    public String getIsdn() {
         return this.isdn;
     }
 
-    public void setIsdn(Long isdn) {
+    public void setIsdn(String isdn) {
         this.isdn = isdn;
     }
 

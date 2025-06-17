@@ -4,21 +4,29 @@ import java.util.Date;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 @Entity
 public class Book {
 
     @Id
-    private Long isdn;
+    @NotBlank
+    @Pattern(regexp = "^(\\d{10}|\\d{13})$", message = "ISDN must be either 10 or 13 digits")
+    private String isdn;
+
+    @NotBlank
     private String title;
+
+    @NotBlank
     private String author;
     private Date releaseDate;
+
+    @NotBlank
     private String content;
 
-    public Book() {
-    };
+    public Book() {};
 
-    public Book(Long isdn, String title, String author, Date releaseDate, String content) {
+    public Book(String isdn, String title, String author, Date releaseDate, String content) {
         this.isdn = isdn;
         this.title = title;
         this.author = author;
@@ -26,11 +34,11 @@ public class Book {
         this.content = content;
     }
 
-    public Long getIsdn() {
+    public String getIsdn() {
         return this.isdn;
     }
 
-    public void setIsdn(Long isdn) {
+    public void setIsdn(String isdn) {
         this.isdn = isdn;
     }
 

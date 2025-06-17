@@ -18,11 +18,15 @@
 package com.endpoint.endpoint.controllers;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +39,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.endpoint.endpoint.dto.BookDTO;
 import com.endpoint.endpoint.model.Book;
 import com.endpoint.endpoint.services.BookService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/books")
@@ -63,27 +69,36 @@ public class BookController {
 
     @GetMapping("/isdn/{isdn}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public Optional<BookDTO> getBookByIsdn(@PathVariable Long isdn) {
+    public Optional<BookDTO> getBookByIsdn(@PathVariable String isdn) {
         return bookService.getByIsdn(isdn);
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public BookDTO creatBook(@RequestBody BookDTO bookDto) {
-        return bookService.createBook(bookDto);
+    public ResponseEntity<?> createBook(@RequestBody @Valid BookDTO bookDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error -> 
+                errors.put(error.getField(), error.getDefaultMessage())
+            );
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        BookDTO createdBook = bookService.createBook(bookDto);
+        return ResponseEntity.ok(createdBook);
     }
 
     @PutMapping("/{isdn}/{title}/{content}/{author}/{releaseDate}")
     @PreAuthorize("hasRole('ADMIN')")
-    public BookDTO updateBook(@PathVariable("isdn") Long isdm, @PathVariable("title") String title,
+    public BookDTO updateBook(@PathVariable("isdn") String isdn, @PathVariable("title") String title,
             @PathVariable("content") String content, @PathVariable("author") String author,
-            @PathVariable("date") Date releaseDate, @RequestBody Book book) {
-        return bookService.updateBook(isdm, title, content, author, releaseDate, book);
+            @PathVariable("date") Date releaseDate, @RequestBody @Valid Book book) {
+        return bookService.updateBook(isdn, title, content, author, releaseDate, book);
     }
 
     @DeleteMapping("/{isdn}")
     @PreAuthorize("hasRole('ADMIN')")
-    public boolean deleteBook(@PathVariable Long isdn) {
+    public boolean deleteBook(@PathVariable String isdn) {
         return bookService.deleteBook(isdn);
     }
 }

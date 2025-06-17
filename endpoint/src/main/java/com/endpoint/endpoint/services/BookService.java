@@ -54,7 +54,7 @@ public class BookService {
         return BookMapper.OptionaltoDTO(book);
     }
 
-    public Optional<BookDTO> getByIsdn(Long isdn) {
+    public Optional<BookDTO> getByIsdn(String isdn) {
         Optional<Book> book = bookRepository.findByIsdn(isdn);
         return BookMapper.OptionaltoDTO(book);
     }
@@ -65,7 +65,7 @@ public class BookService {
         return BookMapper.toDTO(savedBook);
     }
 
-    public BookDTO updateBook(Long isdn, String title, String content, String author, Date releaseDate, Book book) {
+    public BookDTO updateBook(String isdn, String title, String content, String author, Date releaseDate, Book book) {
         if (bookRepository.existsById(isdn)) {
             book.setIsdn(isdn);
             book.setTitle(title);
@@ -78,7 +78,7 @@ public class BookService {
         return null;
     }
 
-    public boolean deleteBook(Long isdn) {
+    public boolean deleteBook(String isdn) {
         if (bookRepository.existsById(isdn)) {
             bookRepository.deleteById(isdn);
             return true;

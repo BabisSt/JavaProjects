@@ -15,11 +15,11 @@ import org.springframework.stereotype.Repository;
 import com.endpoint.endpoint.model.Book;
 
 @Repository
-public interface BookRepository extends JpaRepository<Book, Long> {
+public interface BookRepository extends JpaRepository<Book, String> {
 
     Optional<Book> findByTitle(String title);
 
-    Optional<Book> findByIsdn(Long isdn);
+    Optional<Book> findByIsdn(String isdn);
 
     Optional<List<Book>> findByAuthor(String author);
 }
