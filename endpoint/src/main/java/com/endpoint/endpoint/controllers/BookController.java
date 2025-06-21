@@ -78,9 +78,7 @@ public class BookController {
     public ResponseEntity<?> createBook(@RequestBody @Valid BookDTO bookDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error -> 
-                errors.put(error.getField(), error.getDefaultMessage())
-            );
+            bindingResult.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
             return ResponseEntity.badRequest().body(errors);
         }
 

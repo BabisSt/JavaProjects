@@ -14,12 +14,14 @@ import org.springframework.stereotype.Repository;
 
 import com.endpoint.endpoint.model.Book;
 
+import io.micrometer.common.lang.NonNull;
+
 @Repository
 public interface BookRepository extends JpaRepository<Book, String> {
 
-    Optional<Book> findByTitle(String title);
+    Optional<Book> findByTitle(@NonNull String title);
 
-    Optional<Book> findByIsdn(String isdn);
+    Optional<Book> findByIsdn(@NonNull String isdn);
 
-    Optional<List<Book>> findByAuthor(String author);
+    Optional<List<Book>> findByAuthor(@NonNull String author);
 }

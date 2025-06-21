@@ -2,29 +2,43 @@ package com.endpoint.endpoint.model;
 
 import java.util.Date;
 
+import org.springframework.core.style.ToStringCreator;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+
 @Entity
+@Table(name = "books")
 public class Book {
 
     @Id
     @NotBlank
     @Pattern(regexp = "^(\\d{10}|\\d{13})$", message = "ISDN must be either 10 or 13 digits")
+    @Column(name = "isdn")
     private String isdn;
 
     @NotBlank
+    @Column(name = "title")
     private String title;
 
     @NotBlank
+    @Column(name = "author")
     private String author;
+
+    @NotBlank
+    @Column(name = "release_date")
     private Date releaseDate;
 
     @NotBlank
+    @Column(name = "content")
     private String content;
 
-    public Book() {};
+    public Book() {
+    };
 
     public Book(String isdn, String title, String author, Date releaseDate, String content) {
         this.isdn = isdn;
@@ -72,5 +86,15 @@ public class Book {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringCreator(this)
+                .append("isdn", this.getIsdn())
+                .append("title", this.getTitle())
+                .append("author", this.getAuthor())
+                .append("releadeDate", this.getReleaseDate())
+                .append("content", this.getContent()).toString();
     }
 }
