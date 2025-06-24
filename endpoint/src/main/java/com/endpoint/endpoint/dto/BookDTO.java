@@ -9,7 +9,11 @@
 
 package com.endpoint.endpoint.dto;
 
+import com.endpoint.endpoint.model.Author;
+
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
@@ -24,13 +28,13 @@ public class BookDTO {
     private String title;
 
     @NotBlank
-    private String author;
-   
+    private Author author;
+
     // Constructors
     public BookDTO() {
     }
 
-    public BookDTO(String isdn, String title, String author) {
+    public BookDTO(String isdn, String title, Author author) {
         this.isdn = isdn;
         this.title = title;
         this.author = author;
@@ -53,11 +57,11 @@ public class BookDTO {
         this.title = title;
     }
 
-    public String getAuthor() {
+    public Author getAuthor() {
         return author;
     }
 
-    public void setAuthor(String author) {
+    public void setAuthor(Author author) {
         this.author = author;
     }
 }

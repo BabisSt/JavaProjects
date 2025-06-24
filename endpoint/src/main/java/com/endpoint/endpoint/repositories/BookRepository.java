@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.endpoint.endpoint.model.Author;
 import com.endpoint.endpoint.model.Book;
 
 import io.micrometer.common.lang.NonNull;
@@ -23,5 +24,5 @@ public interface BookRepository extends JpaRepository<Book, String> {
 
     Optional<Book> findByIsdn(@NonNull String isdn);
 
-    Optional<List<Book>> findByAuthor(@NonNull String author);
+    Optional<List<Book>> findByAuthor(@NonNull Author author);
 }

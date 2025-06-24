@@ -26,18 +26,26 @@ import org.springframework.stereotype.Service;
 
 import com.endpoint.endpoint.dto.BookDTO;
 import com.endpoint.endpoint.mapper.BookMapper;
+import com.endpoint.endpoint.model.Author;
 import com.endpoint.endpoint.model.Book;
 import com.endpoint.endpoint.repositories.BookRepository;
+import com.endpoint.endpoint.repositories.AuthorRepository;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class BookService {
 
     @Autowired
     private BookRepository bookRepository;
+    @Autowired
+    private AuthorRepository authorRepository;
 
     public BookService(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
     }
+
+    public BookService() {
+    };
 
     public List<BookDTO> getAllBooks() {
         List<Book> books = bookRepository.findAll();
@@ -46,7 +54,7 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<List<BookDTO>> getBookByAuthor(String author) {
+    public Optional<List<BookDTO>> getBookByAuthor(Author author) {
         Optional<List<Book>> listOfBooks = bookRepository.findByAuthor(author);
 
         return listOfBooks.map(books -> books.stream().map(b -> BookMapper.toDTO(b)).collect(Collectors.toList()));
@@ -65,11 +73,23 @@ public class BookService {
 
     public BookDTO createBook(BookDTO bookDTO) {
         Book book = BookMapper.toEntity(bookDTO);
+
+        // check if author exists
+        if (book.getAuthor() == null || book.getAuthor().getId() == null) {
+            throw new IllegalArgumentException("Author must be provided with a valid ID.");
+        }
+
+        // if author exists then link it with the new book
+        Author author = authorRepository.findById(book.getAuthor().getId())
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Author not found with id: " + book.getAuthor().getId()));
+        book.setAuthor(author);
         Book savedBook = bookRepository.save(book);
+
         return BookMapper.toDTO(savedBook);
     }
 
-    public BookDTO updateBook(String isdn, String title, String content, String author, Date releaseDate, Book book) {
+    public BookDTO updateBook(String isdn, String title, String content, Author author, Date releaseDate, Book book) {
         if (bookRepository.existsById(isdn)) {
             book.setIsdn(isdn);
             book.setTitle(title);

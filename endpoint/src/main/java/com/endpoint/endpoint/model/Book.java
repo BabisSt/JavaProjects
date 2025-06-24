@@ -7,6 +7,9 @@ import org.springframework.core.style.ToStringCreator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -26,8 +29,9 @@ public class Book {
     private String title;
 
     @NotBlank
-    @Column(name = "author")
-    private String author;
+    @ManyToOne // Each Book Has One Author
+    @JoinColumn(name = "author_id")
+    private Author author;
 
     @NotBlank
     @Column(name = "release_date")
@@ -40,7 +44,7 @@ public class Book {
     public Book() {
     };
 
-    public Book(String isdn, String title, String author, Date releaseDate, String content) {
+    public Book(String isdn, String title, Author author, Date releaseDate, String content) {
         this.isdn = isdn;
         this.title = title;
         this.author = author;
@@ -64,11 +68,11 @@ public class Book {
         this.title = title;
     }
 
-    public String getAuthor() {
+    public Author getAuthor() {
         return this.author;
     }
 
-    public void setAuthor(String author) {
+    public void setAuthor(Author author) {
         this.author = author;
     }
 

@@ -30,7 +30,7 @@ public class BookMapper {
         if (book == null || book.isEmpty())
             return null;
 
-        Book b = book.get(); // unwrap the Optional
+        Book b = book.get();
         return Optional.of(new BookDTO(b.getIsdn(), b.getTitle(), b.getAuthor()));
     }
 
@@ -41,7 +41,7 @@ public class BookMapper {
         Book book = new Book();
         book.setIsdn(bookDTO.getIsdn());
         book.setAuthor(bookDTO.getAuthor());
-        book.setTitle(bookDTO.getAuthor());
+        book.setTitle(bookDTO.getTitle());
 
         book.setContent(null);
         book.setReleaseDate(new Date());

@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.endpoint.endpoint.dto.BookDTO;
+import com.endpoint.endpoint.model.Author;
 import com.endpoint.endpoint.model.Book;
 import com.endpoint.endpoint.services.BookService;
 
@@ -57,7 +58,7 @@ public class BookController {
 
     @GetMapping("/author/{author}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public Optional<List<BookDTO>> getBooksByAuthor(@PathVariable String author) {
+    public Optional<List<BookDTO>> getBooksByAuthor(@PathVariable Author author) {
         return bookService.getBookByAuthor(author);
     }
 
@@ -89,7 +90,7 @@ public class BookController {
     @PutMapping("/{isdn}/{title}/{content}/{author}/{releaseDate}")
     @PreAuthorize("hasRole('ADMIN')")
     public BookDTO updateBook(@PathVariable("isdn") String isdn, @PathVariable("title") String title,
-            @PathVariable("content") String content, @PathVariable("author") String author,
+            @PathVariable("content") String content, @PathVariable("author") Author author,
             @PathVariable("date") Date releaseDate, @RequestBody @Valid Book book) {
         return bookService.updateBook(isdn, title, content, author, releaseDate, book);
     }
